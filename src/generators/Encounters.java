@@ -1,5 +1,8 @@
 package generators;
 
+import player.Actions;
+import utils.Utils;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -26,6 +29,34 @@ public class Encounters {
             "Building: Enter a magic shop and purchase magical items and artifacts.",
             "Traveler: Meet a wise old man and seek his advice and wisdom.",
             "Dungeon: Explore a dragon's lair and confront the beast itself."};
+    // Array of actions for enemy encounters
+    private static final String[] enemyActions = {
+            "Fight",
+            "Attempt to flee",
+            "Negotiate",
+            "Use a special ability"
+    };
+    // Array of actions for building encounters
+    private static final String[] buildingActions = {
+            "Enter the building",
+            "Ignore the building",
+            "Inspect the building",
+            "Ask for directions"
+    };
+    // Array of actions for traveler encounters
+    private static final String[] travelerActions = {
+            "Talk to the traveler",
+            "Ignore the traveler",
+            "Ask for directions",
+            "Trade items"
+    };
+    // Array of actions for dungeon encounters
+    private static final String[] dungeonActions = {
+            "Enter the dungeon",
+            "Ignore the dungeon",
+            "Inspect the dungeon",
+            "Use a special ability"
+    };
 
     public static ArrayList<String> generateEncounters() {
         ArrayList<String> encounters = new ArrayList<>();
@@ -45,40 +76,53 @@ public class Encounters {
     public static void chooseEncounter() {
         ArrayList<String> encounters = generateEncounters();
         Scanner scanner = new Scanner(System.in);
-        System.out.println(encounters);
 
         // Continue choosing encounters until there are none left
         while (!encounters.isEmpty()) {
             // Print the encounters
-            System.out.println("Encounters:");
+            Utils.printLinedText("Encounters:");
             for (int i = 0; i < encounters.size(); i++) {
                 System.out.println(i + ": " + encounters.get(i));
             }
             System.out.println(encounters.size() + ": Avoid encounter");
 
             // Get the chosen encounter
-            System.out.println("Enter the number of the encounter you want to choose:");
-            int encounterChoice = scanner.nextInt();
+            int encounterChoice = Integer.parseInt(Utils.askQuestion("Enter the number of the encounter you want to choose:", "-"));
             if (encounterChoice < 0 || encounterChoice > encounters.size()) {
-                System.out.println("Invalid encounter choice!");
+                Utils.printLinedText("Invalid encounter choice!");
                 continue;
             }
 
             // Perform the chosen encounter or move on if the player chose to avoid
             if (encounterChoice == encounters.size()) {
-                System.out.println("Avoiding encounter.");
+                Utils.printLinedText("You continue on your journey.");
+                Utils.loadingBar();
                 break;
             } else {
                 String chosenEncounter = encounters.get(encounterChoice);
-                // Remove the chosen encounter from the list
+                performEncounter(chosenEncounter);
                 encounters.remove(encounterChoice);
-                System.out.println("Performing encounter: " + chosenEncounter);
-                // ... (add code to perform the chosen encounter here) ...
             }
         }
 
-        // All encounters have been finished, choose a new location to move on
-        System.out.println("All encounters have been finished. Choose a new location to move on (North, East, South, West):");
-        // ... (add code to move to the chosen location here) ...
+        Utils.printLinedText("You have finished all of the encounters in this location. Choose a new location to move on (North, East, South, West):");
+    }
+
+    public static void performEncounter(String encounter) {
+        String[] words = encounter.split(" ");
+        String type = words[0].substring(0, words[0].length() - 1);
+        String[] actions = new String[0];
+        if (type.equals("Enemy")) {
+            actions = enemyActions;
+        } else if (type.equals("Building")) {
+            actions = buildingActions;
+        } else if (type.equals("Traveler")) {
+            actions = travelerActions;
+        } else if (type.equals("Dungeon")) {
+            actions = dungeonActions;
+        } else {
+            System.out.println("Invalid encounter type: " + type);
+        }
+        Actions.engageEncounter(actions);
     }
 }
