@@ -2,33 +2,119 @@ import java.util.Scanner;
 
 public class PriceCalculator {
 
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        System.out.print("Enter the weight of the item in pounds: ");
-        double weight = input.nextDouble();
-        double pricePerPound = 5.0;
-        double totalPrice = 0.0;
-        if (weight > 25.0) {
-            totalPrice = weight;
-        } else {
-            for (int i = 0; (double) i < weight; i += 5) {
-                if (i > 25) {
-                    pricePerPound = 1.0;
-                }
+    public static double enterWeight() {
 
-                totalPrice += pricePerPound * 5.0;
-                --pricePerPound;
+        // get user input
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter the weight of the item in pounds: ");
+        String weight = input.next();
+        double weightDouble = 0;
+
+        // check if the weight is a double
+        try {
+            weightDouble = Double.parseDouble(weight);
+            System.out.println("The weight is: " + weightDouble);
+        } catch (NumberFormatException e) {
+            System.out.println("The weight is not a number");
+        }
+
+        // check if its a positive number
+        if (weightDouble < 1) {
+            System.out.println("The weight is not a positive number");
+            // if its not, ask to input again
+            enterWeight();
+        }
+
+
+        return weightDouble;
+    }
+
+
+    public static String userInput(String question, String type, String[] options) {
+
+
+        // get user input
+        Scanner input = new Scanner(System.in);
+
+        System.out.println(question);
+        String answer = input.next();
+
+        // check if the answer is the same type as parameter type
+
+        if (type == "double") {
+            try {
+                double answerDouble = Double.parseDouble(answer);
+                System.out.println("The answer is: " + answerDouble);
+            } catch (NumberFormatException e) {
+                System.out.println("The answer is not a number");
             }
         }
-        System.out.println("The total price is: $" + totalPrice);
-        System.out.println("Enter 'Ground' for ground shipping or 'Air' for air shipping: ");
-        String shippingMethod = input.next();
+
+        if (type == "string") {
+            try {
+                String answerString = answer;
+                System.out.println("The answer is: " + answerString);
+            } catch (NumberFormatException e) {
+                System.out.println("The answer is not a string");
+            }
+        }
+
+        Boolean answerIsInArray = false;
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].contains(answer)) {
+                answerIsInArray = true;
+                break;
+            }
+        }
+
+        if (!answerIsInArray) {
+            System.out.println("The answer is not one of the options");
+            userInput(question, type, options);
+        }
+
+
+        return answer;
+
+
+    }
+
+    public static void main(String[] args) {
+
+        // get user input
+        Scanner input = new Scanner(System.in);
+
+        double weight = enterWeight();
+        // we declare global variables
+        double pricePerPound;
+        double totalPrice;
         double shippingPrice = 0;
-        if (shippingMethod.equalsIgnoreCase("Ground")) {
+
+        if (weight <= 5) {
+            pricePerPound = 5.0;
+        } else if (weight <= 10 && weight > 5) {
+            pricePerPound = 4.0;
+        } else if (weight <= 15 && weight > 10) {
+            pricePerPound = 3.0;
+        } else if (weight <= 20 && weight > 15) {
+            pricePerPound = 2.0;
+        } else {
+            pricePerPound = 1.0;
+        }
+
+        totalPrice = weight * pricePerPound;
+
+
+        System.out.println("The total price is: $" + totalPrice + " because the weight is: " + weight + " pounds and the price per pound is: $" + pricePerPound);
+
+
+        String shippingMethod = userInput("Please choose your shipping method (a) Ground | (b) Air:", "string", new String[]{"a", "b"});
+
+        if (shippingMethod.equalsIgnoreCase("a")) {
             shippingPrice = weight * 1.5;
-        } else if (shippingMethod.equalsIgnoreCase("Air")) {
+        } else if (shippingMethod.equalsIgnoreCase("b")) {
             shippingPrice = weight * 2.5;
         }
+
         System.out.println("Shipping method: " + shippingMethod);
         System.out.println("Shipping price: $" + shippingPrice);
 
